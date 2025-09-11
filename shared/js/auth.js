@@ -75,7 +75,8 @@ async function loginUser(event) {
     });
 
     if (!response.ok) {
-      showToastMessage(true, `Login failed: ${response.status}`);
+      responseData = await response.json();
+      showToastMessage(true, `Login failed: ${responseData.detail}`);
       return;
     }
 
@@ -167,7 +168,7 @@ function validateFormElements(input) {
   const form = input.form;
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+  let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
 
   switch (name) {
     case "email":
@@ -185,6 +186,13 @@ function validateFormElements(input) {
       break;
 
     case "password":
+      if (window.location.href.includes("login.html")) {
+        if (value.length === 0) {
+          showError(input, "Bitte Passwort eingeben.");
+          return false;
+        }
+        break;
+      }
       if (!passwordRegex.test(value)) {
         showError(input, "min. 6 Zeichen, 1 x A-Z, 1 x a-z sowie 1 x 0-9");
         return false;
