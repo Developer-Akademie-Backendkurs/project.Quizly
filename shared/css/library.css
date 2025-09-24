@@ -124,6 +124,9 @@ h3 {
 
 .quiz-title {
   color: var(--text-color-green);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .quiz-card {
@@ -170,7 +173,8 @@ h3 {
   #quiz-container-library {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, auto);
-    padding: 0 10px 0 10px;
+    padding: 0 5px 0 5px;
+    text-align: center;
   }
 }
 
@@ -191,10 +195,6 @@ h3 {
 
   h3 {
     font-size: var(--font-size-24);
-  }
-
-  .wrapping-container {
-    width: unset;
   }
 }
 
@@ -275,7 +275,7 @@ h3 {
 
   .quiz-card {
     font-size: var(--font-size-14);
-    padding: 10px;
+    padding: 4px;
   }
 
   .overlay img {

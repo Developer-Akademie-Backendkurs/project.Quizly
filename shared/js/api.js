@@ -14,7 +14,6 @@ async function createQuiz(url) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log(data.detail);
       showToastMessage(true, ["Error generating quiz"]);
       document.querySelector(".overlay").classList.add("d_none");
       return null;

@@ -112,7 +112,6 @@ async function signUpUser(event) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log(data);
       showToastMessage(true, `Register failed: ${data.username} `);
       return;
     }
