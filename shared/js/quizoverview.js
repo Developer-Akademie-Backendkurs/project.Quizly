@@ -8,8 +8,8 @@ let CURRENTQUIZ;
 let QUIZZES;
 
 async function init() {
-  await checkAuth();
   CURRENTQUIZ = await loadQuizzes(getQuizID());
+  if (!CURRENTQUIZ) return;
   headlineInput.value = CURRENTQUIZ.title;
   descriptionInput.value = CURRENTQUIZ.description;
   iFrame.src = getEmbededURL(CURRENTQUIZ.video_url);
@@ -131,7 +131,7 @@ function changeOverviewToQuiz(id) {
   window.location.href = `/pages/quizoverview.html?id=${id}`;
 }
 
-function seeAll() {
+async function seeAll() {
   let isOverview = true;
   let id = CURRENTQUIZ.id;
   window.location.href =

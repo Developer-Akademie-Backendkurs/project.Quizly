@@ -2,7 +2,6 @@ const inputs = document.querySelectorAll("input");
 const checkboxTerms = document.querySelector('input[name="terms"]');
 const pwToggle = document.getElementById("input-lock-password");
 const repPwToggle = document.getElementById("input-lock-repeated-pw");
-let refreshInterval = null;
 
 inputs.forEach((input) => {
   if (input.type !== "checkbox") {
@@ -126,7 +125,7 @@ async function signUpUser(event) {
   }
 }
 
-async function logOut() {
+async function logOut(notoken) {
   try {
     await fetch(`${API_BASE_URL}${LOGOUT_URL}`, {
       method: "POST",
@@ -136,12 +135,19 @@ async function logOut() {
 
       credentials: "include",
     });
-    showToastMessage(false, "Logout successfully!");
+    if (notoken) {
+      window.location.href = "/pages/login.html";
+    } else {
+      showToastMessage(false, "Logout successfully!");
+      setTimeout(() => {
+        window.location.href = "/pages/login.html";
+      }, 2000);
+    }
+  } catch (error) {
+    showToastMessage(true, ["Logout error"]);
     setTimeout(() => {
       window.location.href = "/pages/login.html";
     }, 2000);
-  } catch (error) {
-    showToastMessage(true, ["Logout error"]);
   }
 }
 
@@ -254,60 +260,47 @@ function togglePasswordVisibility(input, icon) {
   }
 }
 
-async function checkAuth() {
-  try {
-    const response = await fetch(`${API_BASE_URL}${GET_QUIZ_URL}`, {
-      credentials: "include",
-    });
-
-    if (response.status === 401) {
-      window.location.href = "/pages/login.html";
-      return;
-    }
-    startRefreshTimer();
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    window.location.href = "/pages/login.html";
-  }
-}
-
-async function getNewToken() {
+async function refreshToken() {
   try {
     const response = await fetch(`${API_BASE_URL}${TOKENREFRESH_URL}`, {
       method: "POST",
       credentials: "include",
     });
 
-    if (response.status === 401 || response.status === 400) {
-      stopRefreshTimer();
-      await logOut();
-      return false;
-    }
-
-    return true;
+    return response.ok;
   } catch (error) {
-    console.error("Token refresh failed:", error);
-    window.location.href = "/pages/login.html";
     return false;
   }
 }
 
-function stopRefreshTimer() {
-  if (refreshInterval !== null) {
-    clearInterval(refreshInterval);
-    refreshInterval = null;
-  }
-}
+async function apiFetch(endpoint, options = {}) {
+  const doRequest = () =>
+    fetch(`${API_BASE_URL}${endpoint}`, {
+      credentials: "include",
+      method: options.method || "GET",
+      body: options.body,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
 
-function startRefreshTimer() {
-  if (refreshInterval !== null) {
-    return;
+  let response = await doRequest();
+
+  if (response.status === 401 || response.status === 403) {
+    const refreshed = await refreshToken();
+    if (!refreshed) {
+      window.location.href = "/pages/login.html";
+      return null;
+    }
+
+    response = await doRequest();
+
+    if (response.status === 401 || response.status === 403) {
+      window.location.href = "/pages/login.html";
+      return null;
+    }
   }
-  refreshInterval = setInterval(
-    async () => {
-      await getNewToken();
-    },
-    20 * 5 * 1000,
-  );
+
+  return response;
 }

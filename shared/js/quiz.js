@@ -109,20 +109,15 @@ function generateNewQuiz() {
 }
 
 async function deleteQuiz(id) {
-  const response = await fetch(`${API_BASE_URL}${GET_QUIZ_URL}${id}/`, {
+  const response = await apiFetch(`${GET_QUIZ_URL}${id}/`, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
   });
-  if (response.ok) {
+  if (response && response.ok) {
     renderQuizList();
   }
 }
 
 async function initQuiz() {
-  await checkAuth();
   let btn = document.querySelector(".btn-go-back");
   if (btn.classList.contains("d_none")) {
     btn.classList.remove("d_none");
@@ -251,15 +246,11 @@ async function backToOverview() {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}${GET_QUIZ_URL}${quizId}/`, {
+    const response = await apiFetch(`${GET_QUIZ_URL}${quizId}/`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
     });
 
-    if (response.ok) {
+    if (response && response.ok) {
       window.location.href = `/pages/quizoverview.html?id=${quizId}`;
     } else {
       window.location.href = "/pages/library.html";

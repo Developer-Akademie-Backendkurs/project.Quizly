@@ -1,12 +1,12 @@
 async function init() {
-  await checkAuth();
   let header = document.getElementById("header");
   header.innerHTML = getHeaderTemplate();
-  renderLastQuizzes();
+  await renderLastQuizzes();
 }
 
 async function renderLastQuizzes() {
   let QUIZZES = await loadQuizzes();
+  if (!QUIZZES) return;
   if (QUIZZES.length <= 0) {
     document.getElementById("wrapping-container").classList.add("d_none");
   } else {
