@@ -1,5 +1,5 @@
-function init() {
-  checkAuth();
+async function init() {
+  await checkAuth();
   let header = document.getElementById("header");
   header.innerHTML = getHeaderTemplate();
   renderLastQuizzes();

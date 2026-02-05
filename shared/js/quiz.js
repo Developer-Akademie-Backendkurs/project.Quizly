@@ -122,7 +122,7 @@ async function deleteQuiz(id) {
 }
 
 async function initQuiz() {
-  checkAuth();
+  await checkAuth();
   let btn = document.querySelector(".btn-go-back");
   if (btn.classList.contains("d_none")) {
     btn.classList.remove("d_none");

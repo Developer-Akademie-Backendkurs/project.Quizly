@@ -2,6 +2,7 @@ const inputs = document.querySelectorAll("input");
 const checkboxTerms = document.querySelector('input[name="terms"]');
 const pwToggle = document.getElementById("input-lock-password");
 const repPwToggle = document.getElementById("input-lock-repeated-pw");
+let refreshInterval = null;
 
 inputs.forEach((input) => {
   if (input.type !== "checkbox") {
@@ -75,7 +76,7 @@ async function loginUser(event) {
     });
 
     if (!response.ok) {
-      responseData = await response.json();
+      let responseData = await response.json();
       showToastMessage(true, `Login failed: ${responseData.detail}`);
       return;
     }
@@ -263,10 +264,50 @@ async function checkAuth() {
       window.location.href = "/pages/login.html";
       return;
     }
-
+    startRefreshTimer();
     const data = await response.json();
     return data;
   } catch (error) {
     window.location.href = "/pages/login.html";
   }
+}
+
+async function getNewToken() {
+  try {
+    const response = await fetch(`${API_BASE_URL}${TOKENREFRESH_URL}`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (response.status === 401 || response.status === 400) {
+      stopRefreshTimer();
+      await logOut();
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Token refresh failed:", error);
+    window.location.href = "/pages/login.html";
+    return false;
+  }
+}
+
+function stopRefreshTimer() {
+  if (refreshInterval !== null) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
+}
+
+function startRefreshTimer() {
+  if (refreshInterval !== null) {
+    return;
+  }
+  refreshInterval = setInterval(
+    async () => {
+      await getNewToken();
+    },
+    20 * 5 * 1000,
+  );
 }

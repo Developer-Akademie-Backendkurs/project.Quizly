@@ -8,7 +8,7 @@ let CURRENTQUIZ;
 let QUIZZES;
 
 async function init() {
-  checkAuth();
+  await checkAuth();
   CURRENTQUIZ = await loadQuizzes(getQuizID());
   headlineInput.value = CURRENTQUIZ.title;
   descriptionInput.value = CURRENTQUIZ.description;
